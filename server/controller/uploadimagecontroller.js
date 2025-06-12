@@ -6,39 +6,31 @@ const {
 } = require("../config/serverConfig.js");
 const generateEncryptionkey = require("../utils/genratekey.js");
 const { encryptFile } = require("../utils/encryption.js");
+const stream = require("stream");
+const FormData = require("form-data");
+const fs = require("fs");
+
 const uploadImageController = async (req, res, next) => {
   try {
     console.log("Upload route hit");
     const address = "0xDF1236a46A0FbbeB1D924360b6a8be389B359881";
     const useraddress = address.toLowerCase();
 
-    console.log("Looking for user with address:", useraddress);
-
     const user = await UserModel.findOne({ useraddress });
 
     if (!user) {
-      console.log("User not found");
       throw new Error("user not found");
     }
 
     if (user.encryptionkey == null) {
-      console.log("No encryption key found for user. Generating one...");
-      const encryptionKey = generateEncryptionkey(64); // returns hex string
+      const encryptionKey = generateEncryptionkey(64); // hex string
       user.encryptionkey = Buffer.from(encryptionKey, "hex");
       await user.save();
-      console.log("Encryption key saved to database.");
     }
 
     if (!req.file) {
-      console.log("No file received in request");
       return res.status(400).json({ error: "No file uploaded" });
     }
-
-    console.log("File received:", {
-      originalname: req.file.originalname,
-      mimetype: req.file.mimetype,
-      size: req.file.size,
-    });
 
     const { encryptedData, iv } = encryptFile(
       req.file.buffer,
@@ -53,12 +45,33 @@ const uploadImageController = async (req, res, next) => {
       pinataSecretApiKey: PINATA_SECRETKEY,
     });
 
-    const authResult = await pinata.testAuthentication();
-    console.log("Pinata authentication successful:", authResult);
+    const bufferStream = new stream.PassThrough();
+    bufferStream.end(encryptedData);
+
+    const metadata = {
+      name: req.file.originalname,
+      keyvalues: {
+        iv: iv.toString("hex"),
+        originalName: req.file.originalname,
+        mimetype: req.file.mimetype,
+      },
+    };
+
+    const options = {
+      pinataMetadata: metadata,
+      pinataOptions: {
+        cidVersion: 1,
+      },
+    };
+
+    const result = await pinata.pinFileToIPFS(bufferStream, options);
+
+    console.log("Uploaded to Pinata:", result);
 
     res.status(200).json({
-      message: "Successfully encrypted and authenticated",
-      result: authResult,
+      message: "Encrypted file uploaded successfully",
+      ipfsHash: result.IpfsHash,
+      metadata: metadata.keyvalues,
     });
   } catch (error) {
     console.error("Server error:", error);
