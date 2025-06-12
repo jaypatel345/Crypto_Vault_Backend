@@ -20,7 +20,7 @@ async function serverstart() {
        console.log("server is running on http://localhost:3000");
      });
  } catch (error) {
-    throw new error();
+    throw new Error();
     console.log(error)
  }
 }

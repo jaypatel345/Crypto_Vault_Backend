@@ -4,22 +4,29 @@ const {
   PINATA_APIKEY,
   PINATA_SECRETKEY,
 } = require("../config/serverConfig.js");
-const { generateEncryptionkey } = require("../utils/genratekey.js");
+const generateEncryptionkey = require("../utils/genratekey.js");
 const { encryptFile } = require("../utils/encryption.js");
-
-const uploadimagecontroller = async (req, res, next) => {
+const uploadImageController = async (req, res, next) => {
   try {
+    console.log("Upload route hit");
     const address = "0xDF1236a46A0FbbeB1D924360b6a8be389B359881";
-    const user = await UserModel.findOne({ useraddress: address });
+    const useraddress = address.toLowerCase();
+
+    console.log("Looking for user with address:", useraddress);
+
+    const user = await UserModel.findOne({ useraddress });
 
     if (!user) {
+      console.log("User not found");
       throw new Error("user not found");
     }
 
     if (user.encryptionkey == null) {
-      const encryptionkey = generateEncryptionkey(64); // AES-256 requires 32-byte (64 hex)
-      user.encryptionkey = Buffer.from(encryptionkey, "hex");
+      console.log("No encryption key found for user. Generating one...");
+      const encryptionKey = generateEncryptionkey(64); // returns hex string
+      user.encryptionkey = Buffer.from(encryptionKey, "hex");
       await user.save();
+      console.log("Encryption key saved to database.");
     }
 
     if (!req.file) {
@@ -27,17 +34,16 @@ const uploadimagecontroller = async (req, res, next) => {
       return res.status(400).json({ error: "No file uploaded" });
     }
 
-    // Encrypt the uploaded file
-    const { encryptedData, iv } = encryptFile(
-      req.file.buffer,
-      user.encryptionkey
-    );
-
     console.log("File received:", {
       originalname: req.file.originalname,
       mimetype: req.file.mimetype,
       size: req.file.size,
     });
+
+    const { encryptedData, iv } = encryptFile(
+      req.file.buffer,
+      user.encryptionkey
+    );
 
     console.log("Encrypted buffer length:", encryptedData.length);
 
@@ -56,10 +62,11 @@ const uploadimagecontroller = async (req, res, next) => {
     });
   } catch (error) {
     console.error("Server error:", error);
-    res
-      .status(500)
-      .json({ error: "Internal server error", detail: error.message });
+    res.status(500).json({
+      error: "Internal server error",
+      detail: error.message,
+    });
   }
 };
 
-module.exports = { uploadimagecontroller };
+module.exports = uploadImageController;

@@ -1,8 +1,8 @@
 const crypto = require('crypto');
 
 // Function to generate a secure encryption key
-const generateEncryptionKey = (length) => {
+const generateEncryptionkey = (length) => {
   return crypto.randomBytes(length / 2).toString('hex');
 };
 
-module.exports = { generateEncryptionKey };
+module.exports = { generateEncryptionkey };
