@@ -3,8 +3,8 @@ module.exports = {
   MONGODB_URL: process.env.MONGODB_URL,
   PORT: process.env.PORT || 3000,
   // JWT_KEY:"",
-  PINATA_API:process.env.PINATA_API,
-  PINATA_SECERTKEY:process.env.PINATA_SECERTKEY,
+  PINATA_APIKEY:process.env.PINATA_APIKEY,
+  PINATA_SECRETKEY:process.env.PINATA_SECRETKEY,
 };
 
 
