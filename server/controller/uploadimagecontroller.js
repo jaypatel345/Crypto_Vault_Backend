@@ -4,7 +4,7 @@ const {
   PINATA_APIKEY,
   PINATA_SECRETKEY,
 } = require("../config/serverConfig.js");
-const generateEncryptionkey = require("../utils/genratekey.js");
+const generateEncryptionkey = require("../utils/generatekey.js");
 const { encryptFile } = require("../utils/encryption.js");
 const stream = require("stream");
 const FormData = require("form-data");
@@ -13,8 +13,11 @@ const fs = require("fs");
 const uploadImageController = async (req, res, next) => {
   try {
     console.log("Upload route hit");
-    const address = "0xDF1236a46A0FbbeB1D924360b6a8be389B359881";
-    const useraddress = address.toLowerCase();
+    const useraddress = (req.address || req.body.address ).toLowerCase();
+
+    if (!useraddress) {
+      return res.status(400).json({ error: "Missing user address" });
+    }
 
     const user = await UserModel.findOne({ useraddress });
 

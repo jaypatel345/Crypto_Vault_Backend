@@ -1,5 +1,7 @@
 const { verifyMessage } = require("ethers");
 const UserModel = require("../models/user.js");
+const jwt = require("jsonwebtoken"); // ✅ Fix casing here
+const { JWT_SECRETKEY } = require("../config/serverConfig.js");
 
 async function authcontroller(req, res) {
   try {
@@ -11,7 +13,6 @@ async function authcontroller(req, res) {
     }
 
     const message = "welcome to my application";
-
     const recoveredAddress = verifyMessage(message, signature);
 
     if (recoveredAddress.toLowerCase() !== address.toLowerCase()) {
@@ -27,12 +28,19 @@ async function authcontroller(req, res) {
       console.log("New user created:", user);
     }
 
-    console.log("Authenticated address:", recoveredAddress);
-    res.status(200).json({ success: true, address: recoveredAddress });
+    // Generate JWT token
+    const token = jwt.sign({ address: lowerAddress }, JWT_SECRETKEY, {
+      expiresIn: "1h", // Optional: expires in 1 hour
+    });
+
+    return res.status(200).json({
+      message: "Authentication Successful",
+      token,
+    });
 
   } catch (error) {
     console.error("Verification error:", error);
-    res.status(500).json({ error: "Internal server error" });
+    return res.status(500).json({ error: "Internal server error" });
   }
 }
 
