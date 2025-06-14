@@ -1,7 +1,8 @@
 const multer = require('multer');
 
-const storage = multer.memoryStorage();
+// Store file in memory for encryption
+const storage = () => multer.memoryStorage();
 
-const uploadUserImage = multer({ storage }).single("file");
-
-module.exports = { uploadUserImage };
+module.exports = {
+  uploadUserImage: multer({ storage: storage() }).single('file')  // file → must match frontend key
+};
