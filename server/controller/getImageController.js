@@ -30,8 +30,18 @@ const getImageController = async (req, res, next) => {
 
     console.log("Requested IPFS Hashes:", ipfsHashArray);
 
-    // Placeholder for decryption
+    // Decrypt each IPFS hash in ipfsHashArray and collect results
     const decryptedImageArr = [];
+    for (const ipfsHash of ipfsHashArray) {
+      try {
+        // decryptData should take the hash and return the decrypted image data (e.g., Buffer, base64, etc.)
+        const decrypted = await decryptData(ipfsHash, user);
+        decryptedImageArr.push(decrypted);
+      } catch (err) {
+        console.error(`Failed to decrypt hash ${ipfsHash}:`, err);
+        decryptedImageArr.push(null); // or handle error as appropriate
+      }
+    }
 
     res.status(200).json({
       message: "Image Sent",

@@ -1,6 +1,6 @@
 const jwt = require('jsonwebtoken')
 const {JWT_SECRETKEY} = require('../config/serverConfig')
-async function authenticateToken(req,res,next){
+async function authenticatetoken(req,res,next){
     try {
         const token = req.headers['x-access-token']
         
@@ -15,4 +15,4 @@ async function authenticateToken(req,res,next){
         res.status(500).json({message:"Internal Server Error"})
     }
 }
-module.exports={authenticateToken}
+module.exports={authenticatetoken}
