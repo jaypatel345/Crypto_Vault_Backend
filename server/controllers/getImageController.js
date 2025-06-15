@@ -24,7 +24,7 @@ async function getImageController(req, res, next) {
 
     const { page, limit } = req.query;
     const pageNumber = parseInt(page, 10) || 1;
-    const limitNumber = parseInt(limit, 10) || 1;
+    const limitNumber = parseInt(limit, 10) || 4;
 
     if (pageNumber < 1 || limitNumber < 1) {
       return res.status(400).json({ message: "Invalid pagination values" });
