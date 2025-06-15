@@ -10,6 +10,11 @@ const storage = multer.memoryStorage();
 const upload = multer({ storage: storage });
 
 // POST /api/uploadImage
-router.post('/uploadImage', authenticateToken, upload.single('file'), uploadImageController);
+router.post(
+  '/uploadImage',
+  authenticateToken,          // JWT authentication middleware
+  upload.single('file'),      // Handle single file upload in memory
+  uploadImageController       // Controller to process upload
+);
 
 module.exports = router;

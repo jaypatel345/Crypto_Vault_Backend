@@ -7,6 +7,9 @@ const pinataSDK = require('@pinata/sdk');
 
 async function uploadImageController(req, res, next) {
   try {
+    console.log("uploadImageController hit");
+console.log("req.file:", req.file);
+console.log("req.address:", req.address);
     const address = req.address;
     console.log("Received address:", address);
 
@@ -43,7 +46,11 @@ async function uploadImageController(req, res, next) {
       iv: iv.toString('base64')
     });
 
-    res.status(200).json({ ipfsHash: resPinata.IpfsHash, message: "Image Uploaded" });
+    res.status(200).json({
+      ipfsHash: resPinata.IpfsHash,
+      message: "Image Uploaded",
+      imageUrl: `https://gateway.pinata.cloud/ipfs/${resPinata.IpfsHash}`
+    });
   } catch (error) {
     console.error("Upload failed:", error);
     res.status(500).json({ message: "Internal Server Error", error: error.message });

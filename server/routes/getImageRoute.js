@@ -1,8 +1,14 @@
-const express = require('express')
+const express = require('express');
 const router = express.Router();
-const {getImageController}=require('../controllers/getImageController')
-const {authenticateToken}= require('../middleware/authenticateToken')
 
-router.post('/getImage',authenticateToken,getImageController)
+const { getImageController } = require('../controllers/getImageController');
+const { authenticateToken } = require('../middleware/authenticateToken');
 
-module.exports=router
+// POST /api/getImage
+router.post(
+  '/getImage',
+  authenticateToken,         // JWT authentication middleware
+  getImageController         // Controller to fetch and decrypt images
+);
+
+module.exports = router;

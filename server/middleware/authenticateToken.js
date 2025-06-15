@@ -2,7 +2,12 @@ const jwt = require("jsonwebtoken");
 const { JWT_SECRETKEY } = require("../config/serverConfig");
 
 const authenticateToken = (req, res, next) => {
-  const token = req.headers["x-access-token"];
+  // Accept JWT from the Authorization header as 'Bearer <token>'
+  const authHeader = req.headers["authorization"];
+  const token = authHeader && authHeader.startsWith('Bearer ')
+    ? authHeader.split(' ')[1]
+    : null;
+
   if (!token) {
     return res.status(401).json({ message: "Access Token Required" });
   }

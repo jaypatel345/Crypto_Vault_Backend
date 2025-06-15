@@ -1,7 +1,12 @@
-const express = require('express')
+const express = require('express');
 const router = express.Router();
-const {authController}=require('../controllers/authController')
 
-router.post('/authentication',authController)
+const { authController } = require('../controllers/authController');
 
-module.exports=router
+// POST /api/authentication
+router.post(
+  '/authentication',
+  authController             // Controller to handle wallet signature auth and JWT issuance
+);
+
+module.exports = router;
