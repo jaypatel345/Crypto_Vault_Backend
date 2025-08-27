@@ -1,6 +1,6 @@
 const ethers = require("ethers");
 const { verifyMessage } = require("ethers");
-const UserModel = require('../models/User');
+const UserModel = require('../models/user');
 const jwt = require('jsonwebtoken');
 const { JWT_SECRETKEY } = require('../config/serverConfig');
 
