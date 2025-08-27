@@ -1,4 +1,4 @@
-const UserModel = require('../models/User');
+const UserModel = require('../models/user');
 const { decryptData } = require('../utils/decryption');
 const axios = require('axios');
 

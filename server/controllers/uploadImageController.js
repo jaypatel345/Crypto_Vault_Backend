@@ -1,5 +1,5 @@
 const ethers = require('ethers');
-const UserModel = require('../models/User');
+const UserModel = require('../models/user');
 const { PINATA_APIKEY, PINATA_SECRETKEY } = require('../config/serverConfig');
 const { generateEncryptionKey } = require('../utils/generatekey');
 const { encryptFile } = require('../utils/encryption');
