@@ -1,43 +1,36 @@
-const ethers = require("ethers");
-const { verifyMessage } = require("ethers");
-const UserModel = require('../models/user');
 const jwt = require('jsonwebtoken');
+const UserModel = require('../models/user');
 const { JWT_SECRETKEY } = require('../config/serverConfig');
 
+// ⚠️ WARNING: This bypasses signature verification (use only for testing!)
 async function authController(req, res, next) {
   try {
-    const { signature } = req.body;
     const { address: queryAddress } = req.query;
-
-    if (!signature) {
-      return res.status(400).json({ message: "Signature is required" });
-    }
 
     if (!queryAddress) {
       return res.status(400).json({ message: "Address query parameter is required" });
     }
 
-    const recoveredAddress = verifyMessage("Welcome to Crypto Vault Website", signature);
+    const normalizedAddress = queryAddress.toLowerCase();
 
-    if (queryAddress.toLowerCase() !== recoveredAddress.toLowerCase()) {
-      return res.status(401).json({ message: "Authentication failed: address mismatch" });
-    }
-
-    const normalizedAddress = recoveredAddress.toLowerCase();
-
+    // Check if user exists, else create
     let user = await UserModel.findOne({ userAddress: normalizedAddress });
     if (!user) {
       user = await UserModel.create({ userAddress: normalizedAddress });
       console.log('New user created:', user);
     }
 
+    // Generate JWT
     const token = jwt.sign(
       { address: normalizedAddress },
       JWT_SECRETKEY,
-      { expiresIn: '1h' } // Token expires in 1 hour
+      { expiresIn: '1h' }
     );
 
-    return res.status(200).json({ message: "Authentication successful", token });
+    return res.status(200).json({
+      message: "Authentication successful (test mode, no signature check)",
+      token
+    });
   } catch (error) {
     console.error('AuthController error:', error);
     return res.status(500).json({ message: "Internal server error" });

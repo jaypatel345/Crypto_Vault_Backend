@@ -7,7 +7,14 @@ const authenticationRoute = require('./routes/authenticationRoute');
 const uploadImageRoute = require('./routes/uploadImageRoute');
 const getImageRoute = require('./routes/getImageRoute');
 
-app.use(cors());
+app.use(cors({
+  origin: [
+    "http://localhost:5173",            // local dev
+    "https://your-frontend.vercel.app"  // deployed frontend
+  ],
+  methods: ["GET", "POST", "PUT", "DELETE"],
+  credentials: true
+}));
 app.use(express.json());
 
 // Optional: Health check endpoint
