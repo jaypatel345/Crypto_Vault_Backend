@@ -7,23 +7,28 @@ const authenticationRoute = require('./routes/authenticationRoute');
 const uploadImageRoute = require('./routes/uploadImageRoute');
 const getImageRoute = require('./routes/getImageRoute');
 
+// ✅ CORS configuration to allow local dev and deployed frontend
 app.use(cors({
   origin: [
-    "http://localhost:5173",            // local dev
-    "https://your-frontend.vercel.app"  // deployed frontend
+    "http://localhost:5173",                      // local dev
+    "https://crypto-vault-lyart.vercel.app"      // deployed frontend
   ],
   methods: ["GET", "POST", "PUT", "DELETE"],
   credentials: true
 }));
+
+// Parse JSON bodies
 app.use(express.json());
 
 // Optional: Health check endpoint
 app.get('/api/health', (req, res) => res.status(200).json({ status: 'ok' }));
 
+// Routes
 app.use('/api', authenticationRoute);
 app.use('/api', uploadImageRoute);
 app.use('/api', getImageRoute);
 
+// Start server
 async function serverStart() {
   try {
     await connectDB(MONGODB_URL);
@@ -36,7 +41,7 @@ async function serverStart() {
   }
 }
 
-// Optional: Handle unhandled promise rejections
+// Handle unhandled promise rejections
 process.on('unhandledRejection', (reason, promise) => {
   console.error('Unhandled Rejection:', reason);
   // Optionally exit process or perform cleanup
